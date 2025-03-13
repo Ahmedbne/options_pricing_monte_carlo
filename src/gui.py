@@ -1,7 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
 from black_scholes import black_scholes
-from monte_carlo import monte_carlo_option_pricing
+from monte_carlo import (
+    monte_carlo_option_pricing,
+    monte_carlo_option_antithetic,
+    monte_carlo_option_importance_sampling,
+)
 
 def calculate_option():
     try:
@@ -12,11 +16,17 @@ def calculate_option():
         sigma = float(entry_sigma.get())
         option_type = option_var.get()
         method = method_var.get()
+        variance_reduction = variance_var.get()
 
         if method == "Black-Scholes":
             price = black_scholes(S, K, T, r, sigma, option_type)
         elif method == "Monte Carlo":
-            price = monte_carlo_option_pricing(S, K, T, r, sigma, option_type=option_type)
+            if variance_reduction == "None":
+                price = monte_carlo_option_pricing(S, K, T, r, sigma, option_type=option_type)
+            elif variance_reduction == "Antithetic":
+                price = monte_carlo_option_antithetic(S, K, T, r, sigma, option_type=option_type)
+            elif variance_reduction == "Importance Sampling":
+                price = monte_carlo_option_importance_sampling(S, K, T, r, sigma, option_type=option_type)
         else:
             messagebox.showerror("Input Error", "Invalid pricing method selected.")
             return
@@ -62,12 +72,20 @@ tk.Label(root, text="Pricing Method:").grid(row=7, column=0)
 tk.Radiobutton(root, text="Black-Scholes", variable=method_var, value="Black-Scholes").grid(row=7, column=1)
 tk.Radiobutton(root, text="Monte Carlo", variable=method_var, value="Monte Carlo").grid(row=8, column=1)
 
+# Variance Reduction Options (Only for Monte Carlo)
+variance_var = tk.StringVar(value="None")
+tk.Label(root, text="Variance Reduction:").grid(row=9, column=0)
+tk.Radiobutton(root, text="None", variable=variance_var, value="None").grid(row=9, column=1)
+tk.Radiobutton(root, text="Antithetic", variable=variance_var, value="Antithetic").grid(row=10, column=1)
+tk.Radiobutton(root, text="Importance Sampling", variable=variance_var, value="Importance Sampling").grid(row=11, column=1)
+
 # Calculate button
 calc_button = tk.Button(root, text="Calculate Price", command=calculate_option)
-calc_button.grid(row=9, column=0, columnspan=2)
+calc_button.grid(row=12, column=0, columnspan=2)
 
 # Result Label
 result_label = tk.Label(root, text="", font=("Arial", 12, "bold"))
-result_label.grid(row=10, column=0, columnspan=2)
+result_label.grid(row=13, column=0, columnspan=2)
 
+# Run the GUI
 root.mainloop()
