@@ -5,6 +5,7 @@ from monte_carlo import (
     monte_carlo_option_pricing,
     monte_carlo_option_antithetic,
     monte_carlo_option_importance_sampling,
+    plot_monte_carlo_paths
 )
 
 def calculate_option():
@@ -32,6 +33,17 @@ def calculate_option():
             return
 
         result_label.config(text=f"{method} {option_type.capitalize()} Price: {price:.4f}")
+    except ValueError:
+        messagebox.showerror("Input Error", "Please enter valid numeric values.")
+
+def plot_paths():
+    try:
+        S = float(entry_S.get())
+        T = float(entry_T.get())
+        r = float(entry_r.get())
+        sigma = float(entry_sigma.get())
+
+        plot_monte_carlo_paths(S, T, r, sigma)
     except ValueError:
         messagebox.showerror("Input Error", "Please enter valid numeric values.")
 
@@ -83,9 +95,13 @@ tk.Radiobutton(root, text="Importance Sampling", variable=variance_var, value="I
 calc_button = tk.Button(root, text="Calculate Price", command=calculate_option)
 calc_button.grid(row=12, column=0, columnspan=2)
 
+# Button for Monte Carlo Path Visualization
+plot_button = tk.Button(root, text="Show Monte Carlo Paths", command=plot_paths)
+plot_button.grid(row=13, column=0, columnspan=2)
+
 # Result Label
 result_label = tk.Label(root, text="", font=("Arial", 12, "bold"))
-result_label.grid(row=13, column=0, columnspan=2)
+result_label.grid(row=14, column=0, columnspan=2)
 
 # Run the GUI
 root.mainloop()
